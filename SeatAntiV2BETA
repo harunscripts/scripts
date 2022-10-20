@@ -1,0 +1,121 @@
+local Player = game:GetService"Players".LocalPlayer
+local Whitelist = {}
+
+local Seats = {}
+for _,v in pairs(workspace:GetDescendants()) do
+    if v:IsA"Seat" then
+        table.insert(Seats, v)
+    end
+end
+local function locateSeat()
+    local seat = nil
+    if Player.Character:FindFirstChild("Head") == nil then
+        return false
+    end
+
+    local ClosestRange = math.huge
+    for _,v in pairs(Seats) do
+        local Magnitude = (v.Position - Player.Character:WaitForChild"Head".Position).Magnitude
+        if (Magnitude <= ClosestRange) and (v.Occupant == nil) and (v.Parent ~= game:GetService"ReplicatedStorage") then
+            ClosestRange = Magnitude
+            seat = v
+        end
+    end
+
+    return seat
+end
+
+local SavedSettings = {
+    FallenPartsDestroyHeight = workspace.FallenPartsDestroyHeight,
+    Gravity = workspace.Gravity
+}
+
+local function SetDeletion()
+    Player.Character.ChildAdded:Connect(function(t)
+        if not table.find(Whitelist, t) and t:IsA"Tool" then
+            game:GetService"RunService".Heartbeat:Wait()
+            t:Destroy()
+        end
+    end)
+end
+SetDeletion()
+Player.CharacterAdded:Connect(SetDeletion)
+
+local CD = false
+
+workspace.DescendantRemoving:Connect(function(v)
+    if v:IsA"Humanoid" or (v.Name == "LeftKneeRigAttachment") and (CD == false) then
+        CD = true
+        task.spawn(function()
+            pcall(function()
+                plr.CharacterAdded:Wait()
+                CD = false
+            end)
+        end)
+        local Parent = nil
+        if v:IsA"Humanoid" then Parent = v.Parent end
+        if v.Name == "LeftKneeRigAttachment" then Parent = v.Parent.Parent end
+        local Position = Player.Character.PrimaryPart.CFrame
+        local Seat = locateSeat()
+        local SeatPosition = nil
+
+        workspace.FallenPartsDestroyHeight = 0/0
+        workspace.Gravity = 0
+
+        task.spawn(function()
+            pcall(function()
+                Player.CharacterAdded:Wait()
+                for _,v in pairs(SavedSettings) do
+                    workspace[i] = v
+                end
+            end)
+        end)
+
+        if typeof(Seat) == "Instance" then
+            SeatPosition = Seat.CFrame
+            Seat.CFrame = Position
+            Seat.CanCollide = false
+
+            task.spawn(function()
+                pcall(function()
+                    plr.CharacterAdded:Wait()
+                    Seat.CFrame = SeatPosition
+                    Seat.CanCollide = true
+                end)
+            end)
+
+            Seat:Sit(Player.Character.Humanoid)
+            task.spawn(function()
+                task.wait(.2)
+                Seat:Sit(Player.Character.Humanoid)
+            end)
+            task.wait(2)
+            Player.Character.Humanoid.Jump = true
+            Player.Character.Humanoid.Sit = false
+
+            task.spawn(function()
+                pcall(function()
+                    local OldParent = Seat.Parent
+                    Seat.CFrame = SeatPosition
+                    Seat.Parent = game:GetService"ReplicatedStorage"
+                    Player.Character:SetPrimaryPartCFrame(Position)
+                    task.wait(.2)
+                    Seat.Parent = OldParent
+                    Position = Player.Character.PrimaryPart.CFrame
+                end)
+            end)
+            task.wait(.2)
+            for i,v in pairs(SavedSettings) do
+                workspace[i] = v
+            end
+            Player.Character:SetPrimaryPartCFrame(Position)
+            CD = false
+            pcall(function()
+                if Parent == workspace then return end
+                if Parent:FindFirstChildOfClass"Humanoid" == nil and Parent:FindFirstChild"Head" ~= nil then
+                    Instance.new("Humanoid", workspace):Destroy()
+                end
+            end)
+        end
+    end
+end)
