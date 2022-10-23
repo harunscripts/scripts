@@ -14,7 +14,7 @@ old = hookmetamethod(game, "__namecall", function(self, ...)
     if (method == "GetClientId" and self == game:GetService("RbxAnalyticsService")) and checkcaller() then
         return game:GetService("HttpService"):GenerateGUID(false):upper()
     end
-    if (method == "GetUserAgent" and self == game:GetService("HttpService")) then
+    if (method == "GetUserAgent" and self == game:GetService("HttpService")) and checkcaller() then
         return ""
     end
     return old(self, unpack(args))
