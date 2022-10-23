@@ -1,6 +1,7 @@
 local UseLatestVersion = true
 --basically breaks rainstorm admin from logging you
 local Plr = game:GetService("Players").LocalPlayer
+local RJOBID = game.JobId
 local old
 old = hookmetamethod(game, "__index", newcclosure(function(...)
     local self, key = ...
@@ -24,10 +25,14 @@ end))
 local hook2
 hook2 = hookmetamethod(game, "__namecall", function(self, ...)
     local method = getnamecallmethod()
+    local args = {...}
     if method == "GetClientId" and self == game:GetService("RbxAnalyticsService") then
         return game:GetService("HttpService"):GenerateGUID(false):upper()
     end
-    return hook2(self, ...)
+    if method == "TeleportToPlaceInstance" and self == game:GetService("TeleportService") then
+        args[2] = RJOBID
+    end
+    return hook2(self, unpack(args))
 end)
 
 if UseLatestVersion then
