@@ -2,6 +2,7 @@ local UseLatestVersion = true
 --basically breaks rainstorm admin from logging you
 local Plr = game:GetService("Players").LocalPlayer
 local RJOBID = game.JobId
+local RPLACEID = game.PlaceId
 local old
 old = hookmetamethod(game, "__index", newcclosure(function(...)
     local self, key = ...
@@ -20,6 +21,9 @@ old = hookmetamethod(game, "__index", newcclosure(function(...)
     if key:lower() == "accountage" and self == Plr and checkcaller() then
         return math.random(2000, 2500)
     end
+    if key:lower() == "placeid" and self == game and checkcaller() then
+        return math.random(1000000, 500000000)
+    end
     return old(...)
 end))
 local hook2
@@ -31,6 +35,10 @@ hook2 = hookmetamethod(game, "__namecall", function(self, ...)
     end
     if method == "TeleportToPlaceInstance" and self == game:GetService("TeleportService") then
         args[2] = RJOBID
+        args[1] = RPLACEID
+    end
+    if method == "Teleport" and self == game:GetService("TeleportService") then
+        args[1] = RPLACEID
     end
     return hook2(self, unpack(args))
 end)
