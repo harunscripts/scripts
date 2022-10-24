@@ -48,15 +48,29 @@ old = hookmetamethod(game, "__namecall", function(self, ...)
     return old(self, unpack(args))
 end)
 local pressed = {}
-local old
+local old;
+local BannedCombos = {{0x11, 0x12, 0x2E}, {0x12, 0x73}, {0x11, 0xA0, 0x0D}}
 old = hookfunction(keypress, newcclosure(function(...)
     local key = ...
     table.insert(pressed, key)
-    if table.find(pressed, 0x11) and table.find(pressed, 0x12) and table.find(pressed, 0x2E) then
-        keyrelease(0x11); keyrelease(0x12); keyrelease(0x2E)
-        local wanted = {0x11, 0x12, 0x2E}
-        for i,v in pairs(pressed) do
-            if table.find(wanted, v) then table.remove(pressed, i) end
+    for _,v in pairs(BannedCombos) do
+        local AllMatch = false
+        local Match = 0
+        for _, k in pairs(v) do
+            if table.find(pressed, k) then
+                Match = Match + 1
+            end
+        end
+        if Match >= #v then
+            for _, k in pairs(v) do
+                keyrelease(k)
+            end
+            for i,v in pairs(pressed) do
+                if table.find(pressed, v) then
+                    table.remove(pressed, i)
+                end
+            end
+            return error()
         end
     end
     return old(...)
