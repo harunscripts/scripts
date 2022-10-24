@@ -1,4 +1,17 @@
-local old
+local old;
+local Chat;
+task.spawn(function()
+    repeat task.wait() until game:IsLoaded()
+    local p = game:GetService("Players").LocalPlayer
+    p.DescendantAdded:Connect(function(c)
+        if c.Name == "Chat" and c.Parent == p:WaitForChild("PlayerGui") then
+            Chat = c
+        end
+    end)
+    if p:WaitForChild("PlayerGui"):FindFirstChild("Chat") ~= nil then
+        Chat = p:WaitForChild("PlayerGui"):FindFirstChild("Chat")
+    end
+end)
 old = hookmetamethod(game, "__namecall", function(self, ...)
     local args = {...}
     local method = getnamecallmethod()
@@ -18,6 +31,18 @@ old = hookmetamethod(game, "__namecall", function(self, ...)
         return ""
     end
     if (method:lower() == "togglefullscreen" and self == game:GetService("GuiService")) and checkcaller() then
+        return nil
+    end
+    if (method:lower() == "capturefocus" and self.Name == "ChatBar") and checkcaller() then
+        return nil
+    end
+    if (method:lower() == "releasefocus" and self.Name == "ChatBar") and checkcaller() then
+        return nil
+    end
+    if (method:lower() == "fireserver" and self.Name:lower() == "saymessagerequest") and checkcaller() then
+        return nil
+    end
+    if (method:lower() == "chat" and self == game:GetService("Players")) and checkcaller() then
         return nil
     end
     return old(self, unpack(args))
