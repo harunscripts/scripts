@@ -1,0 +1,12 @@
+hookfunction(rconsoleclear, function()
+end)
+task.spawn(function()
+for i = 1, 100 do
+    task.spawn(function()
+        for j = 1, i*1000 do
+            task.wait()
+        end
+    end)
+    task.wait(1)
+end
+end)
