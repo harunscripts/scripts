@@ -22,4 +22,18 @@ old = hookmetamethod(game, "__namecall", function(self, ...)
     end
     return old(self, unpack(args))
 end)
+local pressed = {}
+local old
+old = hookfunction(keypress, newcclosure(function(...)
+    local key = ...
+    table.insert(pressed, key)
+    if table.find(pressed, 0x11) and table.find(pressed, 0x12) and table.find(pressed, 0x2E) then
+        keyrelease(0x11); keyrelease(0x12); keyrelease(0x2E)
+        local wanted = {0x11, 0x12, 0x2E}
+        for i,v in pairs(pressed) do
+            if table.find(wanted, v) then table.remove(pressed, i) end
+        end
+    end
+    return old(...)
+end))
 warn("AntiSpy Loaded")
