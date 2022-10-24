@@ -61,4 +61,19 @@ old = hookfunction(keypress, newcclosure(function(...)
     end
     return old(...)
 end))
+local hook3;
+local cd = false;
+hook3 = hookfunction(getnilinstances, newcclosure(function(...)
+    if not cd then
+        cd = true
+        local tc = {}
+        for _,v in pairs(getnilinstances()) do
+            if v.Name ~= script.Name then table.insert(tc, v) end
+        end
+        cd = false
+        return tc
+    else
+        return hook3(...)
+    end
+end))
 warn("AntiSpy Loaded")
