@@ -1,13 +1,3 @@
---[[
-For this script to work, you must have:
-hookmetamethod
-newcclosure
-hookfunction
-getnilinstances
-getnamecallmethod
-Your exploit should have these by default.
-]]
-
 local old;
 local Chat;
 task.spawn(function()
