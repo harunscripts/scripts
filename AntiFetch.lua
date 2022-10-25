@@ -1,15 +1,3 @@
---[[
-For this script to work, you must have:
-
-hookmetamethod
-newcclosure
-hookfunction
-getnilinstances
-getnamecallmethod
-
-Your exploit should have these by default.
-]]
-
 local old;
 local Chat;
 task.spawn(function()
@@ -55,6 +43,9 @@ old = hookmetamethod(game, "__namecall", function(self, ...)
         return nil
     end
     if (method:lower() == "chat" and self == game:GetService("Players")) and checkcaller() then
+        return nil
+    end
+    if (self == game:GetService("BrowserService")) and checkcaller() then
         return nil
     end
     return old(self, unpack(args))
