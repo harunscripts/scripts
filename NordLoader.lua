@@ -54,6 +54,14 @@ Nord["Themes"] = {
             ["TextColor3"] = Color3.new(1, 1, 1)
         }
     },
+    ["hub"] = {
+        ["Frame"] = {
+            ["BackgroundColor3"] = Color3.fromRGB(85, 85, 127);
+        },
+        ["TextLabel"] = {
+            ["TextColor3"] = Color3.new(1, 1, 1)
+        }
+    },
     ["discord"] = {
         ["Frame"] = {
             ["BackgroundColor3"] = Color3.fromRGB(44, 47, 51);
